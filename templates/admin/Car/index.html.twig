@@ -1,0 +1,74 @@
+{# templates/admin/car/index.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des voitures{% endblock %}
+
+{% block content %}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="mb-0">Gestion des voitures</h1>
+            </div>
+            <div class="col-sm-6">
+                <a href="{{ path('admin_car_new') }}" class="btn btn-success float-sm-end">
+                    <i class="bi bi-plus-circle"></i> Ajouter une voiture
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Marque</th>
+                            <th>Modèle</th>
+                            <th>Année</th>
+                            <th>Prix</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for car in cars %}
+                        <tr>
+                            <td>
+                                {% if car.imageName %}
+                                    <img src="{{ asset('uploads/cars/' ~ car.imageName) }}" alt="{{ car.brand }}" style="max-height: 50px;">
+                                {% else %}
+                                    <span class="text-muted">Aucune image</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ car.brand }}</td>
+                            <td>{{ car.model }}</td>
+                            <td>{{ car.year }}</td>
+                            <td>{{ car.price|format_currency('EUR') }}</td>
+                            <td>
+                                <a href="{{ path('admin_car_edit', {'id': car.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_car_delete', {'id': car.id}) }}" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
+                                    <button class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune voiture trouvée</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

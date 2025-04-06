@@ -1,0 +1,36 @@
+{# templates/admin/car/new.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle voiture{% endblock %}
+
+{% block content %}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="mb-0">{% block form_title %}Nouvelle voiture{% endblock %}</h1>
+            </div>
+            <div class="col-sm-6">
+                <a href="{{ path('admin_car_index') }}" class="btn btn-secondary float-sm-end">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Enregistrer
+                    </button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
