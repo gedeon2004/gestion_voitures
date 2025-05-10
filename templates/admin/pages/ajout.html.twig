@@ -1,0 +1,363 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouvelle Voiture | Dashboard{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #434343 0%, #000000 100%);
+            --accent-color: #e74c3c;
+            --success-gradient: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+        
+        .form-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .form-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+        }
+        
+        .card-header-glow {
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+        
+        .card-header-glow::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotateGlow 12s linear infinite;
+        }
+        
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-control-custom {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            background-color: #fafafa;
+        }
+        
+        .form-control-custom:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+            background-color: white;
+            transform: translateY(-2px);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .btn-magic {
+            background: var(--success-gradient);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 50px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.4s;
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-magic:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(39, 174, 96, 0.4);
+            color: white;
+        }
+        
+        .btn-magic::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .btn-magic:hover::after {
+            opacity: 1;
+        }
+        
+        .price-input-group {
+            position: relative;
+        }
+        
+        .price-input-group::before {
+            content: '$';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            color: #7f8c8d;
+            z-index: 10;
+        }
+        
+        .price-input {
+            padding-left: 35px !important;
+        }
+        
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .rating-stars i {
+            color: #f1c40f;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .rating-stars i:hover {
+            transform: scale(1.2);
+        }
+        
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 30px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--accent-color);
+            background-color: #fff;
+        }
+        
+        .file-upload-label i {
+            font-size: 2.5rem;
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-label:hover i {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            animation: fadeIn 0.6s forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <!-- Header avec effet glow animé -->
+                <div class="card-header card-header-glow text-white text-center position-relative">
+                    <div class="position-relative z-index-2">
+                        <h2 class="mb-3"><i class="bi bi-car-front-fill"></i> NOUVELLE VOITURE</h2>
+                        <p class="mb-0 opacity-75">Remplissez les détails pour ajouter un nouveau véhicule</p>
+                    </div>
+                </div>
+                
+                <div class="card-body p-5">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                    
+                    <div class="row g-4">
+                        <!-- Marque et Modèle -->
+                        <div class="col-md-6 form-group">
+                            {{ form_label(form.marque, 'Marque du véhicule') }}
+                            {{ form_widget(form.marque, {'attr': {
+                                'class': 'form-control form-control-custom',
+                                'placeholder': 'Ex: Tesla'
+                            }}) }}
+                            <small class="text-muted">La marque du véhicule</small>
+                        </div>
+                        
+                        <div class="col-md-6 form-group delay-1">
+                            {{ form_label(form.modele, 'Modèle du véhicule') }}
+                            {{ form_widget(form.modele, {'attr': {
+                                'class': 'form-control form-control-custom',
+                                'placeholder': 'Ex: Model S'
+                            }}) }}
+                            <small class="text-muted">Le modèle spécifique</small>
+                        </div>
+                        
+                        <!-- Année et Note -->
+                        <div class="col-md-4 form-group delay-1">
+                            {{ form_label(form.annee, 'Année de fabrication') }}
+                            {{ form_widget(form.annee, {'attr': {
+                                'class': 'form-control form-control-custom',
+                                'placeholder': '2023'
+                            }}) }}
+                        </div>
+                        
+                        <div class="col-md-4 form-group delay-2">
+                            {{ form_label(form.note, 'Note (1-5)') }}
+                            {{ form_widget(form.note, {'attr': {
+                                'class': 'form-control form-control-custom',
+                                'min': 1,
+                                'max': 5
+                            }}) }}
+                            <div class="rating-stars">
+                                {% for i in 1..5 %}
+                                    <i class="bi bi-star-fill" data-value="{{ i }}"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Prix -->
+                        <div class="col-md-6 form-group delay-2">
+                            <div class="price-input-group">
+                                {{ form_label(form.prixActuel, 'Prix actuel') }}
+                                {{ form_widget(form.prixActuel, {'attr': {
+                                    'class': 'form-control form-control-custom price-input',
+                                    'placeholder': '0.00'
+                                }}) }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 form-group delay-3">
+                            <div class="price-input-group">
+                                {{ form_label(form.ancienPrix, 'Ancien prix (optionnel)') }}
+                                {{ form_widget(form.ancienPrix, {'attr': {
+                                    'class': 'form-control form-control-custom price-input',
+                                    'placeholder': '0.00'
+                                }}) }}
+                            </div>
+                        </div>
+                        
+                        <!-- Upload d'image -->
+                        <div class="col-12 form-group delay-3">
+                            <div class="file-upload-wrapper">
+                                {{ form_label(form.image, 'Photo du véhicule', {'label_attr': {'class': 'form-label'}}) }}
+                                <label for="{{ form.image.vars.id }}" class="file-upload-label">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    <span class="d-block">Glissez-déposez votre image ou cliquez pour parcourir</span>
+                                    <small class="text-muted">Formats supportés: JPG, PNG (Max 5MB)</small>
+                                </label>
+                                {{ form_widget(form.image, {'attr': {
+                                    'class': 'd-none'
+                                }}) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton de soumission -->
+                    <div class="text-center mt-5">
+                        <button type="submit" class="btn btn-magic">
+                            <i class="bi bi-lightning-charge-fill me-2"></i> AJOUTER CE VÉHICULE
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Animation des étoiles pour la note
+        document.querySelectorAll('.rating-stars i').forEach(star => {
+            star.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                document.getElementById('{{ form.note.vars.id }}').value = value;
+                
+                // Mise à jour de l'affichage des étoiles
+                document.querySelectorAll('.rating-stars i').forEach((s, index) => {
+                    if (index < value) {
+                        s.classList.add('bi-star-fill');
+                        s.classList.remove('bi-star');
+                    } else {
+                        s.classList.remove('bi-star-fill');
+                        s.classList.add('bi-star');
+                    }
+                });
+            });
+        });
+        
+        // Preview de l'image uploadée
+        const fileInput = document.getElementById('{{ form.image.vars.id }}');
+        const fileLabel = document.querySelector('.file-upload-label');
+        
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    fileLabel.innerHTML = `
+                        <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 150px; margin-bottom: 1rem;">
+                        <div class="text-success">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            ${fileInput.files[0].name}
+                        </div>
+                        <small class="text-muted d-block">Cliquez pour changer</small>
+                    `;
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                group.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+{% endblock %}

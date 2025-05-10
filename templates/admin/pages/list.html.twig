@@ -1,0 +1,107 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Liste des Voitures{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+
+    {#  Message flash confirmation #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+             {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+   
+
+    <div class="row">
+        {% for voiture in voitures %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ asset('uploads/' ~ voiture.image) }}" class="card-img-top" alt="{{ voiture.marque }} {{ voiture.modele }}" style="height: 200px; object-fit: cover;">
+
+                    <div class="card-body text-center">
+                        {# Note #}
+                        <div class="mb-2">
+                            {% for i in 1..5 %}
+                                {% if i <= voiture.note %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {#  Marque + Modèle + Année #}
+                        <h5 class="card-title">
+                            <strong class="text-danger">{{ voiture.marque }} {{ voiture.modele }}</strong>
+                        </h5>
+                        <p class="text-muted">{{ voiture.annee }}</p>
+
+                        {# Prix #}
+                        <p>
+                            <span class="text-muted text-decoration-line-through">${{ voiture.ancienPrix | number_format(2, '.', ',') }}</span>
+                            <span class="fw-bold fs-5">${{ voiture.prixActuel | number_format(2, '.', ',') }}</span>
+                        </p>
+                    </div>
+
+                    {# 🔧 Boutons actions #}
+                    <div class="card-footer text-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ path('app_admin_edit', {'id': voiture.id}) }}" class="btn btn-warning btn-sm d-flex align-items-center">
+                                 Modifier
+                            </a>
+
+                            <form method="post" action="{{ path('app_admin_delete', {'id': voiture.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?');" style="display: inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ voiture.id) }}">
+                                <button class="btn btn-danger btn-sm d-flex align-items-center">
+                                     Supprimer
+                                </button>
+                            </form>
+
+                            <a href="{{ path('app_admin_toggle_publish', {'id': voiture.id}) }}"
+                               class="btn btn-secondary btn-sm d-flex align-items-center">
+                                {% if voiture.isPublished %}
+                                     Dépublier
+                                {% else %}
+                                     Publier
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p>Aucune voiture enregistrée pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<style>
+    .btn-sm {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-sm:hover {
+        transform: scale(1.05);
+    }
+
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}

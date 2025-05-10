@@ -12,14 +12,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\VoitureRepository; 
 
-class AdminController extends AbstractController
+class ListVoitureController extends AbstractController
 {
-    #[Route('/admin', name: 'app_admin')]
 
-    public function index(): Response
+    #Routes pour retourner la liste des voitures
+    #[Route('/admin/list', name: 'app_admin_list')]
+    public function list(VoitureRepository $voitureRepository): Response
     {
-        
-        return $this->render('admin/index.html.twig');
+        $voitures = $voitureRepository->findAll();
+
+        return $this->render('admin/pages/list.html.twig', [
+            'voitures' => $voitures,
+        ]);
     }
-    
 }
+
