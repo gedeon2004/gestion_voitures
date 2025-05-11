@@ -247,6 +247,47 @@
             70% { box-shadow: 0 0 0 15px rgba(0, 200, 83, 0); }
             100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0); }
         }
+
+
+        .search-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .search-card .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+        
+        .search-card .form-control {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-card .form-control:focus {
+            border-color: #00c853;
+            box-shadow: 0 0 0 0.2rem rgba(0, 200, 83, 0.25);
+        }
+        
+        .search-card .btn-primary {
+            background: var(--success-gradient);
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .search-card .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+        }
     </style>
 {% endblock %}
 
@@ -254,18 +295,61 @@
 <div class="container py-5">
     <!-- Search Card with animation -->
     <div class="search-card fade-in" style="animation-delay: 0.1s">
-        {{ form_start(searchForm, {'attr': {'class': 'row g-3 align-items-center'}}) }}
-            <div class="col-md-8">
-                {{ form_widget(searchForm.cni, {
-                    'attr': {
-                        'class': 'form-control search-input',
-                        'placeholder': 'Rechercher par numéro CNI...'
-                    }
-                }) }}
+        {{ form_start(searchForm, {'attr': {'class': 'row g-3'}}) }}
+            <!-- Champ CNI -->
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_label(searchForm.cni, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(searchForm.cni, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Rechercher par numéro CNI...'
+                        }
+                    }) }}
+                </div>
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn search-btn w-100">
-                    <i class="bi bi-search me-2"></i> RECHERCHER
+            
+            <!-- Champ Nom -->
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_label(searchForm.nom, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(searchForm.nom, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Rechercher par nom...'
+                        }
+                    }) }}
+                </div>
+            </div>
+            
+            <!-- Champ Date Min -->
+            <div class="col-md-2">
+                <div class="form-group">
+                    {{ form_label(searchForm.dateMin, 'Né après le', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(searchForm.dateMin, {
+                        'attr': {
+                            'class': 'form-control'
+                        }
+                    }) }}
+                </div>
+            </div>
+            
+            <!-- Champ Date Max -->
+            <div class="col-md-2">
+                <div class="form-group">
+                    {{ form_label(searchForm.dateMax, 'Né avant le', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(searchForm.dateMax, {
+                        'attr': {
+                            'class': 'form-control'
+                        }
+                    }) }}
+                </div>
+            </div>
+            
+            <!-- Bouton Rechercher -->
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-2"></i> Rechercher
                 </button>
             </div>
         {{ form_end(searchForm) }}

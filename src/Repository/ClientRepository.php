@@ -17,13 +17,37 @@ class ClientRepository extends ServiceEntityRepository
     }
 
     
-    public function findByCni(string $cni): array
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.cni = :cni')
-            ->setParameter('cni', $cni)
-            ->getQuery()
-            ->getResult();
+    public function searchClients(
+        ?string $cni = null,
+        ?string $nom = null,
+        ?\DateTimeInterface $dateMin = null,
+        ?\DateTimeInterface $dateMax = null
+    ): array {
+        $qb = $this->createQueryBuilder('c');
+    
+        if ($cni) {
+            $qb->andWhere('c.cni LIKE :cni')
+               ->setParameter('cni', '%'.$cni.'%');
+        }
+    
+        if ($nom) {
+            $qb->andWhere('c.nom LIKE :nom')
+               ->setParameter('nom', '%'.$nom.'%');
+        }
+    
+        if ($dateMin && $dateMax) {
+            $qb->andWhere('c.dateNaissance BETWEEN :dateMin AND :dateMax')
+               ->setParameter('dateMin', $dateMin)
+               ->setParameter('dateMax', $dateMax);
+        } elseif ($dateMin) {
+            $qb->andWhere('c.dateNaissance >= :dateMin')
+               ->setParameter('dateMin', $dateMin);
+        } elseif ($dateMax) {
+            $qb->andWhere('c.dateNaissance <= :dateMax')
+               ->setParameter('dateMax', $dateMax);
+        }
+    
+        return $qb->getQuery()->getResult();
     }
 
 

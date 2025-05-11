@@ -19,6 +19,10 @@ class Client
     #[ORM\Column(type: 'string', length: 100)]
     private string $prenom;
 
+    #[ORM\Column(type: 'date', nullable: true)]
+    #[Assert\LessThan('today')]
+    private ?\DateTimeInterface $dateNaissance = null;
+
     #[ORM\Column(type: 'string', length: 150, unique: true)]
     private string $email;
 
@@ -115,6 +119,16 @@ class Client
     public function setPhoto(?string $photo): self
     {
         $this->photo = $photo;
+        return $this;
+    }
+    public function getDateNaissance(): ?\DateTimeInterface
+    {
+        return $this->dateNaissance;
+    }
+
+    public function setDateNaissance(?\DateTimeInterface $dateNaissance): self
+    {
+        $this->dateNaissance = $dateNaissance;
         return $this;
     }
 }
