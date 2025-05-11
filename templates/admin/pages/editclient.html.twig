@@ -1,0 +1,284 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier {{ client.nom|upper }} {{ client.prenom }} | Dashboard{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #434343 0%, #000000 100%);
+            --accent-color: #e74c3c;
+            --edit-gradient: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .edit-client-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .edit-client-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .edit-header-glow {
+            background: var(--edit-gradient);
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+        }
+        
+        .edit-header-glow::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotateGlow 12s linear infinite;
+        }
+        
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-control-edit {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #fafafa;
+        }
+        
+        .form-control-edit:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.15);
+            background-color: white;
+            transform: translateY(-2px);
+        }
+        
+        .current-photo-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            max-width: 200px;
+            border: 3px solid #fff;
+        }
+        
+        .current-photo-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .btn-edit-magic {
+            background: var(--edit-gradient);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 50px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-edit-magic:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(243, 156, 18, 0.4);
+        }
+        
+        .btn-edit-magic::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: -1;
+        }
+        
+        .btn-edit-magic:hover::after {
+            opacity: 1;
+        }
+        
+        .file-upload-edit {
+            display: none;
+        }
+        
+        .file-upload-label-edit {
+            display: block;
+            padding: 1.5rem;
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        
+        .file-upload-label-edit:hover {
+            border-color: var(--accent-color);
+            background-color: #fff;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group-edit {
+            animation: fadeInUp 0.6s forwards;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="edit-client-card">
+                <!-- Header avec effet glow -->
+                <div class="edit-header-glow text-white text-center position-relative">
+                    <div class="position-relative z-index-2">
+                        <h2 class="mb-3"><i class="bi bi-pencil-square"></i> MODIFIER {{ client.nom|upper }} {{ client.prenom|upper }}</h2>
+                        <p class="mb-0 opacity-75">Mettez à jour les informations du client</p>
+                    </div>
+                </div>
+                
+                <div class="card-body p-5">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+                    
+                    <div class="row g-4">
+                        <!-- Nom et Prénom -->
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.1s">
+                            {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.2s">
+                            {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <!-- Email et Téléphone -->
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.3s">
+                            {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.4s">
+                            {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.telephone, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <!-- CNI et Adresse -->
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.5s">
+                            {{ form_label(form.cni, 'Numéro CNI', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.cni, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <div class="col-md-6 form-group-edit" style="animation-delay: 0.6s">
+                            {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.adresse, {'attr': {'class': 'form-control-edit'}}) }}
+                        </div>
+                        
+                        <!-- Photo -->
+                        <div class="col-12 form-group-edit" style="animation-delay: 0.7s">
+                            {{ form_label(form.photo, 'Photo du client', {'label_attr': {'class': 'form-label'}}) }}
+                            
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    {% if client.photo %}
+                                        <div class="current-photo-container mb-3">
+                                            <img src="{{ asset('uploads/clients/' ~ client.photo) }}" 
+                                                 class="img-fluid"
+                                                 alt="Photo actuelle de {{ client.nom }} {{ client.prenom }}">
+                                        </div>
+                                        <small class="text-muted">Photo actuelle</small>
+                                    {% else %}
+                                        <div class="bg-light p-4 rounded text-center mb-3">
+                                            <i class="bi bi-person-square fs-1 text-muted"></i>
+                                            <p class="mt-2 mb-0 text-muted">Pas de photo</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <label for="{{ form.photo.vars.id }}" class="file-upload-label-edit">
+                                        <i class="bi bi-cloud-arrow-up fs-3"></i>
+                                        <div class="mt-2">Cliquez pour changer la photo</div>
+                                        <small class="text-muted">Formats supportés: JPG, PNG (Max 5MB)</small>
+                                    </label>
+                                    {{ form_widget(form.photo, {'attr': {'class': 'file-upload-edit'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons d'action -->
+                    <div class="d-flex justify-content-between mt-5">
+                        <a href="{{ path('app_client_list') }}" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-arrow-left me-2"></i> RETOUR
+                        </a>
+                        <button type="submit" class="btn btn-edit-magic">
+                            <i class="bi bi-check-circle-fill me-2"></i> METTRE À JOUR
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Preview de la nouvelle photo
+        document.getElementById('{{ form.photo.vars.id }}').addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const previewContainer = document.querySelector('.current-photo-container');
+                
+                reader.onload = function(e) {
+                    if (!previewContainer) {
+                        // Créer le conteneur si inexistant (cas où pas de photo actuelle)
+                        const photoCol = document.querySelector('.col-md-4');
+                        photoCol.innerHTML = `
+                            <div class="current-photo-container mb-3">
+                                <img src="${e.target.result}" class="img-fluid" id="newPhotoPreview">
+                            </div>
+                            <small class="text-muted">Nouvelle photo</small>
+                        `;
+                    } else {
+                        // Mettre à jour l'image existante
+                        previewContainer.querySelector('img').src = e.target.result;
+                        previewContainer.nextElementSibling.textContent = 'Nouvelle photo';
+                    }
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Animation séquentielle des champs
+        document.querySelectorAll('.form-group-edit').forEach((group, index) => {
+            group.style.animationDelay = `${index * 0.1}s`;
+        });
+    </script>
+{% endblock %}

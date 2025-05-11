@@ -20,15 +20,6 @@ class HomeController extends AbstractController
         return $this->render('home/index.html.twig');
     }
 
-    // #[Route('/voitures', name: 'client_voitures')]
-    // public function index(VoitureRepository $repo): Response
-    // {
-    //     $voitures = $repo->findBy(['isPublished' => true]);
-
-    //     return $this->render('client/voitures.html.twig', [
-    //         'voitures' => $voitures,
-    //     ]);
-    // }
 }
 
  

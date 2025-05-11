@@ -1,0 +1,402 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Liste des Clients | Dashboard{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --accent-color: #00c853;
+            --success-gradient: linear-gradient(135deg, #00c853 0%, #1e3c72 100%);
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: #f8fafc;
+        }
+        
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: none;
+        }
+        
+        .search-input {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-color: #f8f9fa;
+        }
+        
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 200, 83, 0.25);
+            background-color: white;
+        }
+        
+        .client-table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .table-header-glow {
+            background: var(--success-gradient);
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .table-header-glow::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .client-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .client-table thead th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .client-table tbody tr {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .client-table tbody tr:hover {
+            background-color: rgba(0, 200, 83, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .client-table tbody tr:hover td {
+            border-color: transparent;
+        }
+        
+        .client-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+        
+        .client-avatar-container {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .client-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-color: #f8f9fa;
+        }
+        
+        .client-avatar:hover {
+            transform: scale(3);
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .no-clients {
+            padding: 3rem;
+            text-align: center;
+            color: #6c757d;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-table-action {
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            transition: all 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-edit {
+            background-color: #2196F3;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+        }
+        
+        .btn-table-action:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+        
+        .floating-add-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .floating-add-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            filter: brightness(110%);
+        }
+        
+        .search-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
+            background: linear-gradient(135deg, #00c853 0%, #1a237e 100%);
+        }
+        
+        .cni-badge {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 200, 83, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0); }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <!-- Search Card with animation -->
+    <div class="search-card fade-in" style="animation-delay: 0.1s">
+        {{ form_start(searchForm, {'attr': {'class': 'row g-3 align-items-center'}}) }}
+            <div class="col-md-8">
+                {{ form_widget(searchForm.cni, {
+                    'attr': {
+                        'class': 'form-control search-input',
+                        'placeholder': 'Rechercher par numéro CNI...'
+                    }
+                }) }}
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn search-btn w-100">
+                    <i class="bi bi-search me-2"></i> RECHERCHER
+                </button>
+            </div>
+        {{ form_end(searchForm) }}
+    </div>
+
+    <!-- Client Table Container -->
+    <div class="client-table-container fade-in" style="animation-delay: 0.2s">
+        <h2 class="table-header-glow">
+            <i class="bi bi-people-fill me-2"></i> LISTE DES CLIENTS
+            <span class="float-end badge bg-white text-dark">{{ clients|length }} clients</span>
+        </h2>
+        
+        <div class="table-responsive">
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>PHOTO</th>
+                        <th>NOM</th>
+                        <th>PRÉNOM</th>
+                        <th>EMAIL</th>
+                        <th>TÉLÉPHONE</th>
+                        <th>CNI</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr class="fade-in" style="animation-delay: {{ 0.3 + loop.index0 * 0.05 }}s">
+                            <td>
+                                <div class="client-avatar-container">
+                                    {% if client.photo %}
+                                        <img src="{{ asset('uploads/' ~ client.photo) }}" 
+                                             class="client-avatar"
+                                             alt="{{ client.nom }} {{ client.prenom }}"
+                                        >
+                                    {% else %}
+                                        <div class="client-avatar d-flex align-items-center justify-content-center bg-light text-muted">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td><strong>{{ client.nom }}</strong></td>
+                            <td>{{ client.prenom }}</td>
+                            <td><a href="mailto:{{ client.email }}" class="text-primary">{{ client.email }}</a></td>
+                            <td><a href="tel:{{ client.telephone }}" class="text-dark">{{ client.telephone }}</a></td>
+                            <td>
+                                <span class="cni-badge">{{ client.cni }}</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('app_client_edit', {'id': client.id}) }}" 
+                                       class="btn-table-action btn-edit"
+                                       title="Modifier">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a href="{{ path('app_client_delete', {'id': client.id}) }}" 
+                                       class="btn-table-action btn-delete"
+                                       title="Supprimer"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="no-clients">
+                                <i class="bi bi-emoji-frown display-4 text-muted mb-3"></i>
+                                <h4 class="mt-3">Aucun client trouvé</h4>
+                                <p class="text-muted">Commencez par ajouter votre premier client</p>
+                                <a href="{{ path('app_client_ajout') }}" class="btn btn-success mt-3">
+                                    <i class="bi bi-plus-lg me-2"></i>Ajouter un client
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Add Button -->
+<div class="floating-add-btn pulse">
+    <a href="{{ path('app_client_ajout') }}" class="btn btn-success rounded-circle shadow-lg"
+       style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: var(--accent-color); border: none;">
+        <i class="bi bi-plus-lg fs-4 text-white"></i>
+    </a>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Enhanced animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to table rows
+            const rows = document.querySelectorAll('.client-table tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.05)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Fix for avatar images - ensure they fall back to default if error
+            document.querySelectorAll('.client-avatar').forEach(avatar => {
+                avatar.onerror = function() {
+                    this.src = '{{ asset("build/images/default-avatar.jpg") }}';
+                    this.onerror = null; // Prevent infinite loop if default also fails
+                };
+            });
+        });
+        
+        // Add smooth scroll to top when clicking on avatar
+        document.querySelectorAll('.client-avatar').forEach(avatar => {
+            avatar.addEventListener('click', function(e) {
+                if (this.style.transform === 'scale(3)') {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: this.closest('tr').offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
