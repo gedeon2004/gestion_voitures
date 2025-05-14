@@ -328,7 +328,8 @@
                     {{ form_label(searchForm.dateMin, 'Né après le', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(searchForm.dateMin, {
                         'attr': {
-                            'class': 'form-control'
+                            'class': 'form-control',
+                            'value': searchForm.dateMin.vars.value ? searchForm.dateMin.vars.value|date('Y-m-d') : ''
                         }
                     }) }}
                 </div>
@@ -340,7 +341,8 @@
                     {{ form_label(searchForm.dateMax, 'Né avant le', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(searchForm.dateMax, {
                         'attr': {
-                            'class': 'form-control'
+                            'class': 'form-control',
+                            'value': searchForm.dateMax.vars.value ? searchForm.dateMax.vars.value|date('Y-m-d') : ''
                         }
                     }) }}
                 </div>
@@ -370,6 +372,7 @@
                         <th>NOM</th>
                         <th>PRÉNOM</th>
                         <th>EMAIL</th>
+                        <th>Naissance</th>
                         <th>TÉLÉPHONE</th>
                         <th>CNI</th>
                         <th>ACTIONS</th>
@@ -395,6 +398,7 @@
                             <td><strong>{{ client.nom }}</strong></td>
                             <td>{{ client.prenom }}</td>
                             <td><a href="mailto:{{ client.email }}" class="text-primary">{{ client.email }}</a></td>
+                            <td>{{ client.dateNaissance ? client.dateNaissance|date('d/m/Y') : 'Non renseigné' }}</td>
                             <td><a href="tel:{{ client.telephone }}" class="text-dark">{{ client.telephone }}</a></td>
                             <td>
                                 <span class="cni-badge">{{ client.cni }}</span>
